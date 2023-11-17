@@ -1,35 +1,34 @@
 import { PostDto } from './blog.model';
+import { BlogFileRepository, BlogRepository } from './blog.repository';
 
+import { Injectable } from "@nestjs/common";
+
+@Injectable()
 export class BlogService{
 
-    posts = [];
+    blogRepository: BlogRepository;
 
-    getAllPosts() {
-        return this.posts;
+    constructor(){
+        this.blogRepository = new BlogFileRepository();
     }
 
-    createPost(postDto: PostDto) {
-        const id = this.posts.length + 1;
-        this.posts.push({ id: id.toString(), ...postDto, createDt: new Date()});
+    async getAllPosts(){
+        return await this.blogRepository.getAllPost();
     }
 
-    getPost(id) {
-        const post = this.posts.find((post) => {
-            return post.id === id;
-        });
-        console.log(post);
-        return post;
+    createPost(postDto: PostDto){
+        this.blogRepository.createPost(postDto);
     }
 
-    delete(id) {
-        const filteredPosts = this.posts.filter((post) => post.id !== id);
-        this.posts = [...filteredPosts];
+    async getPost(id): Promise<PostDto>{
+        return await this.blogRepository.getPost(id);
     }
-    
-    updatePost(id, postDto: PostDto) {
-        let updateIndex = this.posts.findIndex((post) => post.id === id);
-        const updatePost = {id, ...postDto, updatedDt: new Date()};
-        this.posts[updateIndex] = updatePost;
-        return updatePost;
+
+    delete(id){
+        this.blogRepository.deletePost(id);
+    }
+
+    updatePost(id, postDto: PostDto){
+        this.blogRepository.updatePost(id, postDto);
     }
 }
